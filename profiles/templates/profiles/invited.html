@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    invited
+{% endblock title %}
+
+
+{% block content %}
+
+{% if isEmpty %}
+    <div class="ui warning message">
+        <i class="close icon"></i>
+        <div class="header">
+            You didn't invite anyone yet!
+        </div>
+        Send some invetations, then try again
+    </div>
+{% else %}
+    {% for obj in qs %}
+        <div class="ui segment">
+            <div class="ui grid">
+                <div class="row">
+                    <div class="three wide column">
+                        <img src={{obj.avatar.url}} alt="" class="ui small circular image">
+                    </div>
+                    <div class="thirteen wide column">
+                        <h3>{{obj.user}} </h3>
+                        <p>{{obj.bio}} </p>
+                        <button class="ui primary button mb-7 w-big">
+                            <i class="user icon"></i>see profie</button>
+
+                        <!-- delete request -->
+                        <form action="{% url 'profiles:delete' %}" method="post" style="display: inline !important;">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                            <button type="submit" class="ui negative button w-big">
+                                <i class="trash icon"></i> delete request
+                            </button>
+                        </form>
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock content %}
+    

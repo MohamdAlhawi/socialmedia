@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}main page{% endblock title %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="eleven wide column">
+        {% for obj in qs %}
+        <!-- posts -->
+            <div class="ui fluid card">
+                <div class="content">
+                    <div class="right floated meta">
+                        <div class="ui grid">
+                            <div class="row">
+                                {% ifequal request.user obj.author.user %}
+                                    <a href="{% url 'posts:post-update' obj.pk%}"><button class="ui button bwhite-lg ">Update</button></a>
+                                    <a href="{% url 'posts:post-delete' obj.pk%}"><button class="ui button bwhite-lg ">Delete</button></a>
+                                {% endifequal %}
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <img class="ui avatar image" src={{obj.author.avatar.url}}> 
+                    {{ obj.author.firstName }}
+                    {% if obj.author.lastName %} {{obj.author.lastName}} {% endif %}
+                    <br><p class="ml-5">{{obj.created|timesince}} ago</p>
+                </div>
+                <div class="ui fluid image">
+                    {% if obj.image %}
+                        <img src={{obj.image.url}}>
+                    {% endif %}
+                </div>
+                <div class="content">
+                    <p> {{ obj.content }} </p>
+                    <div class="right floated">
+                        <form action="{% url 'posts:reacted-post-view' %}" method="POST" class="react-form" id="{{obj.id}}">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value={{obj.id}}>
+                            <button type="submit" class="ui bwhite-sm button react-btn{{obj.id}}" >
+                            {% if profile not in obj.reacted.all %}
+                                <i class="thumbs up icon">like</i>
+                            {% else %}
+                                <i class="thumbs down icon">unlike</i>
+                            {% endif %}
+                            </button>
+                            <div class="ui grid">
+                                <div class="column">
+                                    <div class="react-count{{obj.id}}">{{obj.num_reactions}}</div>
+                                </div>
+                                <div class="column">
+                                    reactions
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <i class="comment icon"></i>
+                    <span> {{ obj.num_comments }} comments</span>
+                </div>
+                <div class="extra content">
+                    <div class="mb-5">
+                    
+                    </div>
+                    <button class="cmt_btn ui button mb-5">show / hide comments</button>
+                    <div class="comment-box">
+                    
+                        {% for comment in obj.comment_set.all %}
+                        
+                            <div class="ui segment mb-5">
+                                <img class="ui avatar image" src={{comment.user.avatar.url}}>
+                                <span>{{ comment.user }}</span>
+                                <div class='mt-5'>{{ comment.content }}</div>
+                            </div>
+                        
+                        {% endfor %}
+                    
+                    </div>
+                    <form action="" method="POST"class='ui fluid form'>
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value={{obj.id}}>
+                        {{ commentForm }}
+                        <button type="submit" name="submit_commentForm" class="ui primary button mt-5 w-full">Send</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="five wide column">
+        <div class="ui segment">
+            {% if post_added %}
+                <div class="ui green message">Post added</div>
+            {% endif %}
+            <form action="" method="POST" class='ui form' enctype="multipart/form-data">
+                {% csrf_token %}
+                {{postForm}}
+                <button type='submit' name="submit_postForm" class="ui positive button w-full mt-5">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %} 
+    <script>
+        $( document ).ready(function() {
+            let display = false
+            $(".cmt_btn").click(function () {
+                if (display===false) {
+                    $(this).next(".comment-box").show("slow");
+                    display=true
+                } else {
+                    $(this).next(".comment-box").hide("slow");
+                    display=false
+                }  
+            });
+
+            $(".react-form").submit(function(e){
+                e.preventDefault();
+                const post_id = $(this).attr('id')
+
+                const ractText = $('.react-btn'+post_id).text().trim()
+
+                const url = $(this).attr('action')
+
+                let res;
+                const reactions = $('.react-count'+post_id).text()
+                const reactionsCount = parseInt(reactions)
+                
+                $.ajax({
+                    type:'POST',
+                    url: url,
+                    data:{
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+                        'post_id': post_id,
+                    },
+                    success:function(response){
+                        if (ractText === 'Un'){
+                            $('.react-btn'+post_id).text('like')
+                            res = reactionsCount-1
+                            $('.react-count'+post_id).text(res)
+                        }else{
+                            $('.react-btn'+post_id).text('unlike')
+                            res = reactionsCount+1
+                            $('.react-count'+post_id).text(res)
+                        }
+                        console.log('success', response)
+                    },
+                    error:function(response){
+                        console.log('error', response)
+                    },
+                })
+            })
+        });
+    </script>
+{% endblock scripts %}

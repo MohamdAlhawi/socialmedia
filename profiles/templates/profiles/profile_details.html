@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    profile details
+{% endblock title %}
+
+
+{% block content %}
+
+    <div class="ui grid">
+        <div class="row">
+            <div class="four wide column">
+                <img src={{object.avatar.url}} alt="" class="ui small circular image">
+                <h2>{{object.user}} </h2>
+                <div class="ui vertical fluid menu">
+                    <div class="item">
+                        posts
+                        <div class="ui label">{{object.get_posts_count}}</div>
+                    </div>
+                    <div class="item">
+                        given reactions
+                        <div class="ui label">{{object.get_given_reactions}}</div>
+                    </div>
+                    <div class="item">
+                        recieved reactions
+                        <div class="ui label">{{object.get_recieved_reactions}}</div>
+                    </div>
+                </div>
+                <!-- delete friend -->
+                {% if request.user in object.friends.all %}
+                <form action="{% url 'profiles:delete' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="profile_pk" value={{object.pk}}>
+                    <button type="submit" class="ui negative button w-big" name="delete_friend">
+                        <i class="minus icon"></i> delete friend
+                    </button>
+                </form>
+
+                <!-- accept -->
+                {% elif object.user in relationSenderUser %}
+                    <form action="{% url 'profiles:accept' %}" method="post" >
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{object.pk}}>
+                        <button type="submit" class="ui positive button w-big" name="accept">
+                        <i class="check icon" ></i> accept</button>
+                    </form>
+                
+                <!-- delete request -->
+                    <form action="{% url 'profiles:delete' %}" method="post" >
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{object.pk}}>
+                        <button type="submit" class="ui negative button w-big">
+                            <i class="trash icon"></i> delete request
+                        </button>
+                    </form>
+                    
+                <!-- cancel request -->
+                {% elif object.user in relationReceiverUser %}
+                    <form action="{% url 'profiles:delete' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{object.pk}}>
+                        <button type="submit" class="ui secondary button w-big" name="cancel_request">
+                            <i class="minus icon"></i> cancel request
+                        </button>
+                    </form>
+
+                <!-- add friend -->
+                {% else %}
+                    <form action="{% url 'profiles:invite' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{object.pk}}>
+                        <button type="submit" class="ui primary button w-big" name="add_friend">
+                            <i class="plus square icon"></i> add friend
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="twelve wide column">
+                
+                {% if therePosts %}
+                    
+                    {% for post in posts %}
+                        <div class="segment ui fluid">
+                            {{post.content}}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ui message">no posts yet...</div>
+                        
+                {% endif %}
+                    
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+    

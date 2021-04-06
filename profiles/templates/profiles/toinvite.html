@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    to profiles
+{% endblock title %}
+
+
+{% block content %}
+    <ul>
+        
+        {% for invite in qs %}
+            <li>{{invite}} </li>
+        {% endfor %}
+            
+    </ul>
+{% endblock content %}
+    

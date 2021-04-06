@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    all profiles
+{% endblock title %}
+
+
+{% block content %}
+
+{% if isEmpty %}
+    <div class="ui warning message">
+        <i class="close icon"></i>
+        <div class="header">
+        You must register before you can do that!
+        </div>
+        Visit our registration page, then try again
+    </div>
+{% else %}
+    {% for obj in object_list %}
+        <div class="ui segment">
+            <div class="ui grid">
+                <div class="row">
+                    <div class="three wide column">
+                        <img src={{obj.avatar.url}} alt="" class="ui small circular image">
+                    </div>
+                    <div class="thirteen wide column">
+                        <h3>{{obj.user}} </h3>
+                        <p>{{obj.bio}} </p>
+                        <button class="ui primary button mb-7 w-big">
+                            <i class="user icon"></i>see profie</button>
+
+                        <!-- delete friend -->
+                        {% if request.user in obj.friends.all %}
+                            <form action="{% url 'profiles:delete' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                <button type="submit" class="ui negative button w-big" name="delete_friend">
+                                    <i class="minus icon"></i> delete friend
+                                </button>
+                            </form>
+
+                        <!-- accept -->
+                        {% elif obj.user in relationSenderUser %}
+                            <form action="{% url 'profiles:accept' %}" method="post" >
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                <button type="submit" class="ui positive button w-big" name="accept">
+                                <i class="check icon" ></i> accept</button>
+                            </form>
+                        
+                        <!-- delete request -->
+                            <form action="{% url 'profiles:delete' %}" method="post" >
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                <button type="submit" class="ui negative button w-big">
+                                    <i class="trash icon"></i> delete request
+                                </button>
+                            </form>
+                            
+                        <!-- cancel request -->
+                        {% elif obj.user in relationReceiverUser %}
+                            <form action="{% url 'profiles:delete' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                <button type="submit" class="ui secondary button w-big" name="cancel_request">
+                                    <i class="minus icon"></i> cancel request
+                                </button>
+                            </form>
+
+                        <!-- add friend -->
+                        {% else %}
+                            <form action="{% url 'profiles:invite' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                <button type="submit" class="ui primary button w-big" name="add_friend">
+                                    <i class="plus square icon"></i> add friend
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock content %}
+    

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    {{request.user}}
+{% endblock title %}
+    
+
+{% block content %}
+    <!-- modal -->
+    <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">
+        Update your profile
+        </div>
+        <div class="image content">
+        <div class="ui medium image">
+            <img src={{profile.avatar.url}}>
+        </div>
+        <div class="description">
+            <div class="ui header">add somethings about you</div>
+            <form action="" method="post" class="ui form" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{form.as_p}}
+            </div>
+        </div>
+        <div class="actions">
+        <button class="ui positive right labeled icon button" type="submit">
+            update
+            <i class="checkmark icon"></i>
+        </button>
+        </div>
+    </form>
+    </div>
+        {% if confirm %}
+            <div class="ui green message">Updated</div>
+        {% endif %}
+        
+    <div class="ui grid segment">
+        <br>
+        <h3>{{profile.user}} profile</h3>
+        <div class="row">
+            <div class="five wide column">
+                <img src={{profile.avatar.url}} alt="" class="ui small rounded image">
+                <div class="row mt-5">
+                    <button class="ui secoundary button" id="modal-btn">update profile</button>
+                </div>
+            </div>
+            <div class="nine wide column">
+                <table class="ui table">
+                    <tbody>
+                        <tr>
+                            <td>username</td>
+                            <td>{{profile.user}} </td>
+                        </tr>
+                        <tr>
+                            <td>first name</td>
+                            <td>{{profile.firstName}} </td>
+                        </tr>
+                        <tr>
+                            <td>get_friends_count</td>
+                            <td>{{profile.get_friends_count}} </td>
+                        </tr>
+                        <tr>
+                            <td>get_author_posts</td>
+                            {% for post in profile.get_author_posts %}
+                            <td>
+                                {{post}}
+                            </td>
+                            {% endfor %}
+                            <td>{{profile.get_author_posts.count}}</td>
+                        </tr>
+                        <tr>
+                            <td>get_given_reactions</td>
+                            <td>{{profile.get_given_reactions}} </td>
+                        </tr>
+                        <tr>
+                            <td>get_recieved_reactions</td>
+                            <td>{{profile.get_recieved_reactions}} </td>
+                        </tr>
+                        <tr>
+                            <td>first name</td>
+                            <td>{{profile.firstName}} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+{% endblock content %}
+    

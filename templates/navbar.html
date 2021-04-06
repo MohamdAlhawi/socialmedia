@@ -1,0 +1,61 @@
+{% url 'home' as home %}
+{% url 'posts:posts' as posts %}
+{% url 'profiles:allprofiles' as allprofiles %}
+{% url 'profiles:invites' as invites %}
+{% url 'profiles:invited' as invited %}
+{% url 'profiles:profile' as profile%}
+
+<div class="ui inverted menu nav mb-7">
+    <div class="ui container">
+      <a href="{{home}} " class="{% if request.path == home %}active{% endif %} item">
+          <h3>#Hashtag</h3>
+      </a>
+      {% if request.user.is_authenticated %}
+      <a href="{{posts}} " class="{% if request.path == posts %}active{% endif %} item">
+          Home
+      </a>
+      {% endif %}
+  
+      <div class="right menu">
+          {% if request.user.is_authenticated %}
+          <div class="item">
+              <div class="ui floating dropdown icon button teal"> Friends
+                  <i class="dropdown icon"></i>
+                  <div class="menu">
+                      <a href="{{allprofiles}} " class="{% if request.path == allprofiles %}active{% endif %} item">
+                          All Profiles
+                      </a>
+                      <a href="{{invites}}" class="{% if request.path == invites %}active{% endif %} item">
+                          Invites &nbsp; <div class="ui purple horizontal lable">{{invitesCount}} </div>
+                      </a>
+                      <a href="{{invited}}" class="{% if request.path == invited %}active{% endif %} item">
+                          Invited &nbsp; <div class="ui purple horizontal lable">{{invitedCount}} </div>
+                      </a>
+                  </div>
+               </div>
+          </div>
+               <div class="item">
+                <form action="" method="GET">
+                  <div class="ui action left icon input">
+                  <input class="prompt" type="text" name='q' placeholder="name of a friend...">
+                  <i class="search icon"></i>
+                  <button type='submit' class="ui button">Search</button>
+                  </div>
+              </form>
+              </div>
+          
+              <a href="profile" class="{% if request.path == profile %}active{% endif %} item">
+                  <img src="{{ avatar.url }}" alt="" class="mr-5 ui avatar image"> {{ request.user.profile.firstName }} 
+              </a>
+  
+              <a href='/admin/logout/' class="ui item">
+                  Logout
+              </a>
+          {% else %}
+          <a href="" class="ui item">
+                  Login
+              </a>
+          {% endif %}
+      </div>
+    </div>
+  </div>

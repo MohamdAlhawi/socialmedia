@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    home
+{% endblock title %}
+
+
+{% block content %}
+    
+    {% if request.user.is_authenticated %}
+        hello {{user}}
+    {% endif %}
+    
+{% endblock content %}
+
+
+{% block scripts %}
+    
+{% endblock scripts %}
+    
